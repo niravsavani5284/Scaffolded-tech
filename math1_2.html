@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Addition at the Zoo – Interactive Chapter</title>
+  <style>
+    body {
+      background: #f2f8ff;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      color: #4a90e2;
+      margin-top: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 24px auto;
+      background: #fffbe7;
+      border-radius: 18px;
+      box-shadow: 0 6px 20px #e0e0e0;
+      padding: 28px 16px;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .nav-btn {
+      background: #7c4dff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav-btn:disabled {
+      background: #d1c4e9;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    .question-block {
+      background: #e3f6fd;
+      border-radius: 14px;
+      margin: 20px 0;
+      padding: 18px 12px;
+      box-shadow: 0 2px 8px #cfd8dc;
+      text-align: center;
+    }
+    .question-type {
+      font-size: 1em;
+      color: #7b1fa2;
+      margin-bottom: 4px;
+    }
+    .question-text {
+      font-size: 1.15em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .options, .drag-options, .mini-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+    .option-btn, .mini-btn, .drag-item {
+      background: #ffe082;
+      border: 2px solid #ffb300;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .option-btn:hover, .mini-btn:hover, .drag-item:hover {
+      background: #ffd54f;
+      transform: scale(1.07);
+    }
+    .drop-zone {
+      min-width: 60px;
+      min-height: 36px;
+      background: #e1bee7;
+      border: 2px dashed #7c4dff;
+      color: #7c4dff;
+      text-align: center;
+      line-height: 36px;
+      border-radius: 10px;
+      margin-left: 10px;
+      display: inline-block;
+      font-size: 1.1em;
+    }
+    .instructions {
+      font-size: 1em;
+      color: #1976d2;
+      margin-bottom: 7px;
+    }
+    .feedback {
+      font-size: 1em;
+      color: #43a047;
+      margin-top: 7px;
+      font-weight: bold;
+      min-height: 22px;
+    }
+    .interactive {
+      font-size: 0.98em;
+      color: #ff7043;
+      margin-top: 6px;
+      font-style: italic;
+    }
+    .match-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 7px;
+      justify-content: center;
+    }
+    .match-label {
+      width: 120px;
+      font-weight: bold;
+      color: #1976d2;
+    }
+    .match-select {
+      min-width: 80px;
+      margin-left: 10px;
+      background: #fffde7;
+      border: 1.5px solid #ffb300;
+      border-radius: 7px;
+      font-size: 1em;
+      padding: 3px 8px;
+    }
+    .mini-img {
+      width: 50px;
+      height: 50px;
+      margin: 0 8px;
+    }
+    .balls {
+      margin: 10px auto;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+    .ball {
+      width: 28px;
+      height: 28px;
+      background: #ffb300;
+      border-radius: 50%;
+      display: inline-block;
+      border: 2px solid #ff7043;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 12px 2vw;
+      }
+      .match-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .match-label {
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Addition at the Zoo – Interactive Chapter</h1>
+  <div class="container" id="mainContainer"></div>
+  <script>
+    // Main Topics and Interactive Questions
+    const topics = [
+      {
+        title: "Addition in Real Life: A Day at the Zoo",
+        intro: "Let's use addition to solve real-life problems at the zoo!",
+        questions: [
+          {
+            type: "mcq",
+            text: "If Lily's grandparents also joined them, and there are two grandparents, how many people are at the zoo now? (Lily's family: 4, friends: 2, grandparents: 2)",
+            options: ["6", "8", "7", "9"],
+            answer: "8",
+            instructions: "Click the correct answer.",
+            feedback: "Great job! 8 people are at the zoo.",
+            interactive: "Animation: Family and friends gather at the zoo entrance."
+          },
+          {
+            type: "drag",
+            text: "If one of Lily's friends couldn't come, how many people are at the zoo now? (Lily's family: 4, friends: 1)",
+            options: ["4", "5", "6", "7"],
+            answer: "5",
+            instructions: "Drag the correct number to the answer box.",
+            feedback: "Well done! There are 5 people now.",
+            interactive: "Zoo gate opens with a cheer when correct."
+          },
+          {
+            type: "mini",
+            text: "Mini-Game: Memory Match – Match each group with their count.",
+            pairs: ["Family-4", "Friends-2", "Grandparents-2", "Family-4", "Friends-2", "Grandparents-2"],
+            instructions: "Tap cards to flip and find matching pairs.",
+            feedback: "You found a match! Great memory!",
+            interactive: "Cards flip with cheerful sounds and animations."
+          }
+        ]
+      },
+      {
+        title: "Addition up to 10",
+        intro: "Let's practise adding numbers up to 10 using objects and pictures!",
+        questions: [
+          {
+            type: "mcq",
+            text: "What is 4 + 3?",
+            options: ["6", "7", "8", "9"],
+            answer: "7",
+            instructions: "Click the correct answer.",
+            feedback: "Super! 4 plus 3 is 7.",
+            interactive: "Balls bounce into place to show the total."
+          },
+          {
+            type: "drag",
+            text: "Drag the correct number to complete: 5 + 4 = ?",
+            options: ["7", "8", "9", "10"],
+            answer: "9",
+            instructions: "Drag the correct number to the answer box.",
+            feedback: "Brilliant! 5 plus 4 is 9.",
+            interactive: "Balls bounce into the answer box."
+          },
+          {
+            type: "matching",
+            text: "Match the addition to its answer.",
+            pairs: [
+              {sum: "6 + 3", ans: "9"},
+              {sum: "4 + 1", ans: "5"},
+              {sum: "2 + 5", ans: "7"}
+            ],
+            instructions: "Choose the correct answer for each sum.",
+            feedback: "You matched them all!",
+            interactive: "Lines glow when matched correctly."
+          }
+        ]
+      },
+      {
+        title: "Addition with Zero",
+        intro: "What happens when you add zero? Let's find out!",
+        questions: [
+          {
+            type: "mcq",
+            text: "What is 6 + 0?",
+            options: ["0", "6", "7", "10"],
+            answer: "6",
+            instructions: "Click the correct answer.",
+            feedback: "Correct! Adding zero keeps the number the same.",
+            interactive: "Zero does a happy dance!"
+          },
+          {
+            type: "drag",
+            text: "Drag the correct number to complete: 0 + 8 = ?",
+            options: ["0", "8", "10", "9"],
+            answer: "8",
+            instructions: "Drag the correct number to the answer box.",
+            feedback: "That's right! 0 plus 8 is 8.",
+            interactive: "Zero bounces into the answer box."
+          },
+          {
+            type: "mini",
+            text: "Mini-Game: Bingo – Tap all answers that show adding zero.",
+            bingo: [
+              {sum: "4 + 0", ans: "4"},
+              {sum: "0 + 7", ans: "7"},
+              {sum: "5 + 2", ans: "7"},
+              {sum: "8 + 0", ans: "8"}
+            ],
+            correct: [0,1,3],
+            instructions: "Tap all the answers that show adding zero.",
+            feedback: "Bingo! You found all the zero sums.",
+            interactive: "Bingo card pops with confetti!"
+          }
+        ]
+      }
+    ];
+
+    let currentTopic = 0;
+
+    function renderPage() {
+      const topic = topics[currentTopic];
+      let html = `
+        <div class="nav-buttons">
+          <button class="nav-btn" onclick="prevPage()" ${currentTopic === 0 ? 'disabled' : ''}>Previous</button>
+          <span style="font-size:1.1em;font-weight:bold;">${topic.title}</span>
+          <button class="nav-btn" onclick="nextPage()" ${currentTopic === topics.length - 1 ? 'disabled' : ''}>Next</button>
+        </div>
+        <div style="font-size:1.1em; color:#1976d2; margin-bottom:12px; border-radius:10px; background:#e1f5fe; padding:12px;">
+          <b>Learning Outcome:</b> ${topic.intro}
+        </div>
+      `;
+
+      topic.questions.forEach((q, idx) => {
+        html += `<div class="question-block" id="q${idx}">`;
+        html += `<div class="question-type">${questionTypeLabel(q.type)}</div>`;
+        html += `<div class="question-text">${q.text}</div>`;
+
+        if (q.type === "mcq") {
+          html += `<div class="options">`;
+          q.options.forEach(opt => {
+            html += `<button class="option-btn" onclick="mcqCheck(this, '${q.answer}', 'q${idx}f')">${opt}</button>`;
+          });
+          html += `</div>`;
+        }
+        if (q.type === "drag") {
+          html += `<div class="drag-options">`;
+          q.options.forEach(opt => {
+            html += `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${idx}${opt}">${opt}</div>`;
+          });
+          html += `</div>
+            <span class="drop-zone" id="dropZone${idx}" ondrop="drop(event, '${q.answer}', 'q${idx}f', ${idx})" ondragover="allowDrop(event)">Drop here</span>`;
+        }
+        if (q.type === "matching") {
+          q.pairs.forEach((pair, i) => {
+            html += `<div class="match-row"><span class="match-label">${pair.sum}</span>
+              <select class="match-select" id="match${idx}${i}">
+                <option value="">--Choose--</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
+                <option value="9">9</option>
+              </select></div>`;
+          });
+          html += `<button class="option-btn" onclick="checkMatch(${idx}, '${q.feedback}', ${JSON.stringify(q.pairs)})">Check Answers</button>`;
+        }
+        if (q.type === "mini" && q.pairs) {
+          html += `<div class="mini-options" id="memory-cards${idx}">`;
+          q.pairs.forEach((pair, i) => {
+            html += `<button class="mini-btn" onclick="memoryFlip(${idx},${i})">${pair}</button>`;
+          });
+          html += `</div>`;
+        }
+        if (q.type === "mini" && q.bingo) {
+          html += `<div class="mini-options">`;
+          q.bingo.forEach((item, i) => {
+            html += `<button class="mini-btn" id="bingo${idx}_${i}" onclick="bingoTap(${idx},${i},${JSON.stringify(q.correct)})">${item.sum} = ${item.ans}</button>`;
+          });
+          html += `</div>`;
+        }
+
+        html += `<div class="instructions">${q.instructions}</div>
+          <div class="feedback" id="q${idx}f"></div>
+          <div class="interactive">${q.interactive}</div>
+        </div>`;
+      });
+
+      document.getElementById('mainContainer').innerHTML = html;
+      memoryFlipped = [];
+      memoryMatched = [];
+      bingoSelected = [];
+    }
+
+    function questionTypeLabel(type) {
+      switch(type) {
+        case "mcq": return "Multiple Choice";
+        case "drag": return "Drag-and-Drop";
+        case "matching": return "Matching";
+        case "mini": return "Mini-Game";
+        default: return "";
+      }
+    }
+
+    function prevPage() {
+      if (currentTopic > 0) {
+        currentTopic--;
+        renderPage();
+      }
+    }
+    function nextPage() {
+      if (currentTopic < topics.length - 1) {
+        currentTopic++;
+        renderPage();
+      }
+    }
+
+    // --- MCQ Logic ---
+    function mcqCheck(btn, answer, feedbackId) {
+      const feedback = document.getElementById(feedbackId);
+      if (btn.textContent === answer) {
+        feedback.textContent = "Hooray! You got it!";
+        feedback.style.color = '#43a047';
+        btn.style.background = '#b2dfdb';
+        confetti();
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = '#e53935';
+        btn.style.background = '#ffcdd2';
+      }
+    }
+
+    // --- Drag-and-Drop Logic ---
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function drop(ev, answer, feedbackId, idx) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text");
+      const dragged = document.getElementById(data);
+      const dropZone = document.getElementById('dropZone'+idx);
+      dropZone.textContent = dragged.textContent;
+      const feedback = document.getElementById(feedbackId);
+      if (dragged.textContent === answer) {
+        feedback.textContent = "Yay! You got it!";
+        feedback.style.color = '#43a047';
+        dropZone.style.background = "#b2dfdb";
+        confetti();
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = '#e53935';
+        dropZone.style.background = "#ffcdd2";
+      }
+    }
+
+    // --- Matching Logic ---
+    function checkMatch(idx, feedbackText, pairs) {
+      let isCorrect = true;
+      pairs.forEach((pair, i) => {
+        const select = document.getElementById("match"+idx+i);
+        if (select.value !== pair.ans) isCorrect = false;
+      });
+      const feedback = document.getElementById('q'+idx+'f');
+      if (isCorrect) {
+        feedback.textContent = feedbackText;
+        feedback.style.color = '#43a047';
+        confetti();
+      } else {
+        feedback.textContent = "Try matching again!";
+        feedback.style.color = '#e53935';
+      }
+    }
+
+    // --- Memory Match Mini-Game Logic ---
+    let memoryFlipped = [], memoryMatched = [];
+    function memoryFlip(idx, cardIdx) {
+      const topic = topics[currentTopic];
+      const q = topic.questions.find(q => q.type === "mini" && q.pairs);
+      const pairs = q.pairs;
+      if (!q) return;
+      if (memoryMatched.includes(cardIdx) || memoryFlipped.length === 2) return;
+      const buttons = document.querySelectorAll(`#memory-cards${idx} .mini-btn`);
+      buttons[cardIdx].style.background = "#b2dfdb";
+      memoryFlipped.push(cardIdx);
+      if (memoryFlipped.length === 2) {
+        const [a, b] = memoryFlipped;
+        if (a !== b && pairs[a] === pairs[b]) {
+          memoryMatched.push(a, b);
+          setTimeout(() => {
+            buttons[a].style.visibility = "hidden";
+            buttons[b].style.visibility = "hidden";
+            document.getElementById('q'+idx+'f').textContent = "You found a match! Great memory!";
+            document.getElementById('q'+idx+'f').style.color = "#43a047";
+            if (memoryMatched.length === pairs.length) {
+              document.getElementById('q'+idx+'f').textContent = "You matched them all! Well done!";
+              confetti();
+            }
+            memoryFlipped = [];
+          }, 600);
+        } else {
+          setTimeout(() => {
+            buttons[a].style.background = "#ffe082";
+            buttons[b].style.background = "#ffe082";
+            document.getElementById('q'+idx+'f').textContent = "Try again!";
+            document.getElementById('q'+idx+'f').style.color = "#e53935";
+            memoryFlipped = [];
+          }, 700);
+        }
+      }
+    }
+
+    // --- Bingo Mini-Game Logic ---
+    let bingoSelected = [];
+    function bingoTap(idx, btnIdx, correctArr) {
+      const btn = document.getElementById(`bingo${idx}_${btnIdx}`);
+      if (!bingoSelected.includes(btnIdx)) {
+        bingoSelected.push(btnIdx);
+        btn.style.background = "#b2dfdb";
+      } else {
+        bingoSelected = bingoSelected.filter(x => x !== btnIdx);
+        btn.style.background = "#ffe082";
+      }
+      // Check if all correct are selected and no extra
+      const isCorrect = correctArr.every(i => bingoSelected.includes(i)) && bingoSelected.length === correctArr.length;
+      const feedback = document.getElementById('q'+idx+'f');
+      if (isCorrect) {
+        feedback.textContent = "Bingo! You found all the zero sums.";
+        feedback.style.color = "#43a047";
+        confetti();
+      }
+    }
+
+    // --- Confetti Animation ---
+    function confetti() {
+      for(let i=0;i<20;i++) {
+        let conf = document.createElement('div');
+        conf.style.position = 'fixed';
+        conf.style.left = (Math.random()*100)+'vw';
+        conf.style.top = '-30px';
+        conf.style.fontSize = (Math.random()*16+16)+'px';
+        conf.style.color = ['#ffb300','#43a047','#4a90e2','#ff7043','#e91e63'][Math.floor(Math.random()*5)];
+        conf.innerHTML = '★';
+        document.body.appendChild(conf);
+        let fall = setInterval(()=>{
+          conf.style.top = (parseFloat(conf.style.top)+3)+'px';
+          if(parseFloat(conf.style.top)>window.innerHeight){
+            conf.remove();
+            clearInterval(fall);
+          }
+        }, 16);
+      }
+    }
+
+    // Initial render
+    renderPage();
+  </script>
+</body>
+</html>
