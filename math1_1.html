@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Numbers up to 20 – Interactive Chapter</title>
+  <style>
+    body {
+      background: #f2f8ff;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #4a90e2;
+      margin-top: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 24px auto;
+      background: #fffbe7;
+      border-radius: 18px;
+      box-shadow: 0 6px 20px #e0e0e0;
+      padding: 28px 16px;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .nav-btn {
+      background: #7c4dff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav-btn:disabled {
+      background: #d1c4e9;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    .question-block {
+      background: #e3f6fd;
+      border-radius: 14px;
+      margin: 20px 0;
+      padding: 18px 12px;
+      box-shadow: 0 2px 8px #cfd8dc;
+      text-align: center;
+    }
+    .question-type {
+      font-size: 1em;
+      color: #7b1fa2;
+      margin-bottom: 4px;
+    }
+    .question-text {
+      font-size: 1.15em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .options, .drag-options, .mini-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+    .option-btn, .mini-btn, .drag-item {
+      background: #ffe082;
+      border: 2px solid #ffb300;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .option-btn:hover, .mini-btn:hover, .drag-item:hover {
+      background: #ffd54f;
+      transform: scale(1.07);
+    }
+    .drop-zone {
+      min-width: 60px;
+      min-height: 36px;
+      background: #e1bee7;
+      border: 2px dashed #7c4dff;
+      color: #7c4dff;
+      text-align: center;
+      line-height: 36px;
+      border-radius: 10px;
+      margin-left: 10px;
+      display: inline-block;
+      font-size: 1.1em;
+    }
+    .instructions {
+      font-size: 1em;
+      color: #1976d2;
+      margin-bottom: 7px;
+    }
+    .feedback {
+      font-size: 1em;
+      color: #43a047;
+      margin-top: 7px;
+      font-weight: bold;
+      min-height: 22px;
+    }
+    .interactive {
+      font-size: 0.98em;
+      color: #ff7043;
+      margin-top: 6px;
+      font-style: italic;
+    }
+    .match-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+    .match-label {
+      width: 120px;
+      font-weight: bold;
+      color: #1976d2;
+    }
+    .match-select {
+      min-width: 80px;
+      margin-left: 10px;
+      background: #fffde7;
+      border: 1.5px solid #ffb300;
+      border-radius: 7px;
+      font-size: 1em;
+      padding: 3px 8px;
+    }
+    .hidden {
+      display: none;
+    }
+    .watermelon-group {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 12px;
+      min-height: 110px;
+    }
+    .animal {
+      font-size: 2.2em;
+      margin-right: 5px;
+      margin-left: 5px;
+      transition: transform 0.3s;
+    }
+    .watermelon-img {
+      width: 100px;
+      height: auto;
+      margin: 0 12px;
+      filter: drop-shadow(0 2px 6px #b2dfdb);
+      vertical-align: bottom;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 12px 2vw;
+      }
+      .match-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .match-label {
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Numbers up to 20 – Interactive Chapter</h1>
+  <div class="container" id="mainContainer">
+    <!-- Content will be injected here -->
+  </div>
+  <script>
+    // Main topics and questions (extracted from your PDF)
+    const topics = [
+      {
+        title: "Counting and Grouping Objects",
+        intro: "Let's count animals and objects together! You'll see how numbers grow as more friends join the fun.",
+        questions: [
+          {
+            type: "watermelon", // special type for visual watermelon question
+            text: "How many animals are eating the watermelon now?",
+            options: ["3", "7", "9", "5"],
+            answer: "9",
+            instructions: "Tap a number to see that many animals eating the watermelon. Then, choose the correct answer.",
+            feedback: "Hooray! You counted like a pro!",
+            interactive: "Watch as more animals join the watermelon! Animation and sound on correct answer.",
+          },
+          {
+            type: "drag",
+            text: "Drag the correct number (8) to the fruit basket.",
+            options: ["6", "8", "5", "7"],
+            answer: "8",
+            instructions: "Drag the number to the basket.",
+            feedback: "Yummy! You got it right!",
+            interactive: "Fruit sparkles and bounces when dropped correctly."
+          },
+          {
+            type: "mini",
+            text: "Memory match: Find pairs of animals and their numbers.",
+            pairs: ["🐭-1", "🦌-2", "🐰-3", "🐭-1", "🦌-2", "🐰-3"],
+            instructions: "Tap cards to flip and find matching pairs.",
+            feedback: "You found a match! Great memory!",
+            interactive: "Cards flip with cheerful sounds and animations."
+          }
+        ]
+      },
+      {
+        title: "Writing Numbers and Number Names",
+        intro: "Let's learn how to write numbers and their names! Numbers can be written as symbols and as words.",
+        questions: [
+          {
+            type: "mcq",
+            text: "Which is the correct numeral for eighteen?",
+            options: ["17", "18", "19", "28"],
+            answer: "18",
+            instructions: "Click the correct answer.",
+            feedback: "Brilliant! 18 is the correct numeral.",
+            interactive: "Confetti animation on correct answer."
+          },
+          {
+            type: "matching",
+            text: "Match each number to its name.",
+            pairs: [
+              {num: "11", name: "Eleven"},
+              {num: "15", name: "Fifteen"},
+              {num: "20", name: "Twenty"}
+            ],
+            instructions: "Choose the correct name for each number.",
+            feedback: "Super matching!",
+            interactive: "Lines glow when matched correctly."
+          }
+        ]
+      },
+      {
+        title: "Comparing Numbers: More, Less, and Zero",
+        intro: "Let’s compare numbers! You’ll learn about 'more', 'less', and the special number zero.",
+        questions: [
+          {
+            type: "mcq",
+            text: "Which number is more: 9 or 7?",
+            options: ["7", "9"],
+            answer: "9",
+            instructions: "Click the number that is more.",
+            feedback: "You know your numbers!",
+            interactive: "Confetti animation on correct answer."
+          },
+          {
+            type: "drag",
+            text: "Drag ‘more’ or ‘less’ to complete the sentence: 4 is ___ than 7.",
+            options: ["more", "less"],
+            answer: "less",
+            instructions: "Drag the correct word to the blank.",
+            feedback: "Great job!",
+            interactive: "Words bounce when dropped correctly."
+          },
+          {
+            type: "mcq",
+            text: "What number shows nothing?",
+            options: ["0", "1", "10", "20"],
+            answer: "0",
+            instructions: "Click the number that means nothing.",
+            feedback: "Zero is the hero!",
+            interactive: "Zero sparkles and does a happy dance."
+          }
+        ]
+      },
+      {
+        title: "Number Order: Before, After, In Between",
+        intro: "Let’s put numbers in order! You’ll see which numbers come before, after, and in between.",
+        questions: [
+          {
+            type: "drag",
+            text: "Drag the correct number to fill in the sequence: 8, ___, 10.",
+            options: ["7", "9", "11"],
+            answer: "9",
+            instructions: "Drag the number to the blank space.",
+            feedback: "You completed the pattern!",
+            interactive: "Numbers sparkle when placed correctly."
+          },
+          {
+            type: "matching",
+            text: "Match each number to the one that comes after.",
+            pairs: [
+              {num: "5", next: "6"},
+              {num: "10", next: "11"},
+              {num: "14", next: "15"}
+            ],
+            instructions: "Choose the number that comes after.",
+            feedback: "You’re a sequence superstar!",
+            interactive: "Lines glow and animate on correct matches."
+          }
+        ]
+      }
+    ];
+
+    let currentTopic = 0;
+
+    function renderPage() {
+      const topic = topics[currentTopic];
+      let html = `
+        <div class="nav-buttons">
+          <button class="nav-btn" onclick="prevPage()" ${currentTopic === 0 ? 'disabled' : ''}>Previous</button>
+          <span style="font-size:1.1em;font-weight:bold;">${topic.title}</span>
+          <button class="nav-btn" onclick="nextPage()" ${currentTopic === topics.length - 1 ? 'disabled' : ''}>Next</button>
+        </div>
+        <div style="font-size:1.1em; color:#1976d2; margin-bottom:12px; border-radius:10px; background:#e1f5fe; padding:12px;">
+          <b>Learning Outcome:</b> ${topic.intro}
+        </div>
+      `;
+
+      topic.questions.forEach((q, idx) => {
+        html += `<div class="question-block" id="q${idx}">`;
+        html += `<div class="question-type">${questionTypeLabel(q.type)}</div>`;
+
+        if (q.type === "watermelon") {
+          html += `
+            <div class="watermelon-group" id="watermelonGroup"></div>
+            <div class="question-text">${q.text}</div>
+            <div class="options">
+              <button class="option-btn" onclick="showAnimals(3)">3</button>
+              <button class="option-btn" onclick="showAnimals(7)">7</button>
+              <button class="option-btn" onclick="showAnimals(9)">9</button>
+              <button class="option-btn" onclick="showAnimals(5)">5</button>
+            </div>
+            <div class="instructions">${q.instructions}</div>
+            <div class="feedback" id="q${idx}f"></div>
+            <div class="interactive">${q.interactive}</div>
+          `;
+        }
+        else if (q.type === "mcq") {
+          html += `<div class="question-text">${q.text}</div>`;
+          html += `<div class="options">`;
+          q.options.forEach(opt => {
+            html += `<button class="option-btn" onclick="mcqCheck(this, '${q.answer}', 'q${idx}f')">${opt}</button>`;
+          });
+          html += `</div>`;
+          html += `<div class="instructions">${q.instructions}</div>
+            <div class="feedback" id="q${idx}f"></div>
+            <div class="interactive">${q.interactive}</div>`;
+        }
+        else if (q.type === "drag") {
+          html += `<div class="question-text">${q.text}</div>`;
+          html += `<div class="drag-options">`;
+          q.options.forEach(opt => {
+            html += `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${idx}${opt}">${opt}</div>`;
+          });
+          html += `</div>
+            <span class="drop-zone" id="dropZone${idx}" ondrop="drop(event, '${q.answer}', 'q${idx}f', ${idx})" ondragover="allowDrop(event)">Drop here</span>
+            <div class="instructions">${q.instructions}</div>
+            <div class="feedback" id="q${idx}f"></div>
+            <div class="interactive">${q.interactive}</div>`;
+        }
+        else if (q.type === "matching") {
+          html += `<div class="question-text">${q.text}</div>`;
+          q.pairs.forEach((pair, i) => {
+            html += `<div class="match-row"><span class="match-label">${pair.num || pair.next}</span>
+              <select class="match-select" id="match${idx}${i}">
+                <option value="">--Choose--</option>`;
+            const options = pair.name ? ["Eleven", "Fifteen", "Twenty"] : ["6", "11", "15"];
+            options.forEach(opt => {
+              html += `<option value="${opt}">${opt}</option>`;
+            });
+            html += `</select></div>`;
+          });
+          html += `<button class="option-btn" onclick="checkMatch(${idx}, '${q.feedback}', ${JSON.stringify(q.pairs)})">Check Answers</button>
+            <div class="instructions">${q.instructions}</div>
+            <div class="feedback" id="q${idx}f"></div>
+            <div class="interactive">${q.interactive}</div>`;
+        }
+        else if (q.type === "mini") {
+          html += `<div class="question-text">${q.text}</div>`;
+          html += `<div class="mini-options" id="memory-cards${idx}">`;
+          q.pairs.forEach((pair, i) => {
+            html += `<button class="mini-btn" onclick="memoryFlip(${idx},${i})">${pair}</button>`;
+          });
+          html += `</div>
+            <div class="instructions">${q.instructions}</div>
+            <div class="feedback" id="q${idx}f"></div>
+            <div class="interactive">${q.interactive}</div>`;
+        }
+
+        html += `</div>`;
+      });
+
+      document.getElementById('mainContainer').innerHTML = html;
+
+      // Render watermelon animals for the first question if present
+      if (topic.questions[0] && topic.questions[0].type === "watermelon") {
+        renderWatermelonGroup(9); // Start with the correct answer
+      }
+
+      // Reset memory game state for each page
+      memoryFlipped = [];
+      memoryMatched = [];
+    }
+
+    function questionTypeLabel(type) {
+      switch(type) {
+        case "mcq": return "Multiple Choice";
+        case "drag": return "Drag-and-Drop";
+        case "matching": return "Matching";
+        case "mini": return "Mini-Game: Memory Match";
+        case "watermelon": return "Multiple Choice";
+        default: return "";
+      }
+    }
+
+    function prevPage() {
+      if (currentTopic > 0) {
+        currentTopic--;
+        renderPage();
+      }
+    }
+    function nextPage() {
+      if (currentTopic < topics.length - 1) {
+        currentTopic++;
+        renderPage();
+      }
+    }
+
+    // --- Watermelon Visual Logic ---
+    const animalEmojis = ['🐭','🦌','🐰','🐸','🐢','🐐','🐦','🦊','🐿️'];
+    function renderWatermelonGroup(n) {
+      const group = document.getElementById('watermelonGroup');
+      if (!group) return;
+      let html = '';
+      for (let i = 0; i < n; i++) {
+        html += `<span class="animal" style="transform: scale(${1 + i*0.05});">${animalEmojis[i % animalEmojis.length]}</span>`;
+      }
+      html += `<img src="https://www.svgrepo.com/show/52290/watermelon.svg" alt="Watermelon" class="watermelon-img" />`;
+      group.innerHTML = html;
+    }
+    function showAnimals(n) {
+      renderWatermelonGroup(n);
+      const feedback = document.getElementById('q0f');
+      if (n === 9) {
+        feedback.textContent = "Hooray! You counted like a pro!";
+        feedback.style.color = "#43a047";
+        confetti();
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = "#e53935";
+      }
+    }
+    // Simple confetti animation
+    function confetti() {
+      for(let i=0;i<20;i++) {
+        let conf = document.createElement('div');
+        conf.style.position = 'fixed';
+        conf.style.left = (Math.random()*100)+'vw';
+        conf.style.top = '-30px';
+        conf.style.fontSize = (Math.random()*16+16)+'px';
+        conf.style.color = ['#ffb300','#43a047','#4a90e2','#ff7043','#e91e63'][Math.floor(Math.random()*5)];
+        conf.innerHTML = '★';
+        document.body.appendChild(conf);
+        let fall = setInterval(()=>{
+          conf.style.top = (parseFloat(conf.style.top)+3)+'px';
+          if(parseFloat(conf.style.top)>window.innerHeight){
+            conf.remove();
+            clearInterval(fall);
+          }
+        }, 16);
+      }
+    }
+
+    // --- MCQ Logic ---
+    function mcqCheck(btn, answer, feedbackId) {
+      const feedback = document.getElementById(feedbackId);
+      if (btn.textContent === answer) {
+        feedback.textContent = "Hooray! You got it!";
+        feedback.style.color = '#43a047';
+        btn.style.background = '#b2dfdb';
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = '#e53935';
+        btn.style.background = '#ffcdd2';
+      }
+    }
+
+    // --- Drag-and-Drop Logic ---
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function drop(ev, answer, feedbackId, idx) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text");
+      const dragged = document.getElementById(data);
+      const dropZone = document.getElementById('dropZone'+idx);
+      dropZone.textContent = dragged.textContent;
+      const feedback = document.getElementById(feedbackId);
+      if (dragged.textContent === answer) {
+        feedback.textContent = "Yay! You got it!";
+        feedback.style.color = '#43a047';
+        dropZone.style.background = "#b2dfdb";
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = '#e53935';
+        dropZone.style.background = "#ffcdd2";
+      }
+    }
+
+    // --- Matching Logic ---
+    function checkMatch(idx, feedbackText, pairs) {
+      let isCorrect = true;
+      pairs.forEach((pair, i) => {
+        const select = document.getElementById("match"+idx+i);
+        if (pair.name && select.value !== pair.name) isCorrect = false;
+        if (pair.next && select.value !== pair.next) isCorrect = false;
+      });
+      const feedback = document.getElementById('q'+idx+'f');
+      if (isCorrect) {
+        feedback.textContent = feedbackText;
+        feedback.style.color = '#43a047';
+      } else {
+        feedback.textContent = "Try matching again!";
+        feedback.style.color = '#e53935';
+      }
+    }
+
+    // --- Memory Match Mini-Game Logic ---
+    let memoryFlipped = [], memoryMatched = [];
+    function memoryFlip(idx, cardIdx) {
+      const topic = topics[currentTopic];
+      const q = topic.questions.find(q => q.type === "mini");
+      const pairs = q.pairs;
+      if (!q) return;
+      if (memoryMatched.includes(cardIdx) || memoryFlipped.length === 2) return;
+      const buttons = document.querySelectorAll(`#memory-cards${idx} .mini-btn`);
+      buttons[cardIdx].style.background = "#b2dfdb";
+      memoryFlipped.push(cardIdx);
+      if (memoryFlipped.length === 2) {
+        const [a, b] = memoryFlipped;
+        if (a !== b && pairs[a] === pairs[b]) {
+          memoryMatched.push(a, b);
+          setTimeout(() => {
+            buttons[a].style.visibility = "hidden";
+            buttons[b].style.visibility = "hidden";
+            document.getElementById('q'+idx+'f').textContent = "You found a match! Great memory!";
+            document.getElementById('q'+idx+'f').style.color = "#43a047";
+            if (memoryMatched.length === pairs.length) {
+              document.getElementById('q'+idx+'f').textContent = "You matched them all! Well done!";
+            }
+            memoryFlipped = [];
+          }, 600);
+        } else {
+          setTimeout(() => {
+            buttons[a].style.background = "#ffe082";
+            buttons[b].style.background = "#ffe082";
+            document.getElementById('q'+idx+'f').textContent = "Try again!";
+            document.getElementById('q'+idx+'f').style.color = "#e53935";
+            memoryFlipped = [];
+          }, 700);
+        }
+      }
+    }
+
+    // Initial render
+    renderPage();
+  </script>
+</body>
+</html>
