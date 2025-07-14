@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Addition at the Zoo – Early Years Interactive</title>
+  <style>
+    body {
+      background: #f1f8e9;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      color: #43a047;
+      margin-top: 18px;
+      font-size: 2em;
+      letter-spacing: 1px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 24px auto;
+      background: #fffde7;
+      border-radius: 18px;
+      box-shadow: 0 6px 20px #e0e0e0;
+      padding: 24px 10px;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .nav-btn {
+      background: #7c4dff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav-btn:disabled {
+      background: #d1c4e9;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    .topic-title {
+      text-align: center;
+      font-size: 1.3em;
+      color: #388e3c;
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+    .question-block {
+      background: #e3f6fd;
+      border-radius: 14px;
+      margin: 20px 0;
+      padding: 16px 10px;
+      box-shadow: 0 2px 8px #cfd8dc;
+      text-align: center;
+    }
+    .question-type {
+      font-size: 1em;
+      color: #7b1fa2;
+      margin-bottom: 4px;
+    }
+    .question-text {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #2e7d32;
+    }
+    .options, .drag-options, .mini-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+    .option-btn, .mini-btn, .drag-item {
+      background: #ffe082;
+      border: 2px solid #ffb300;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .option-btn:hover, .mini-btn:hover, .drag-item:hover {
+      background: #ffd54f;
+      transform: scale(1.07);
+    }
+    .drop-zone {
+      min-width: 60px;
+      min-height: 36px;
+      background: #e1bee7;
+      border: 2px dashed #7c4dff;
+      color: #7c4dff;
+      text-align: center;
+      line-height: 36px;
+      border-radius: 10px;
+      margin-left: 10px;
+      display: inline-block;
+      font-size: 1.1em;
+    }
+    .instructions {
+      font-size: 1em;
+      color: #1976d2;
+      margin-bottom: 7px;
+    }
+    .feedback {
+      font-size: 1em;
+      color: #43a047;
+      margin-top: 7px;
+      font-weight: bold;
+      min-height: 22px;
+    }
+    .interactive {
+      font-size: 0.98em;
+      color: #ff7043;
+      margin-top: 6px;
+      font-style: italic;
+    }
+    .match-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 7px;
+      justify-content: center;
+    }
+    .match-label {
+      width: 110px;
+      font-weight: bold;
+      color: #1976d2;
+    }
+    .match-select {
+      min-width: 70px;
+      margin-left: 10px;
+      background: #fffde7;
+      border: 1.5px solid #ffb300;
+      border-radius: 7px;
+      font-size: 1em;
+      padding: 3px 8px;
+    }
+    .balls {
+      margin: 10px auto;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+    .ball {
+      width: 28px;
+      height: 28px;
+      background: #ffb300;
+      border-radius: 50%;
+      display: inline-block;
+      border: 2px solid #ff7043;
+    }
+    .fruit-img {
+      width: 40px;
+      height: 40px;
+      margin: 0 4px;
+      vertical-align: middle;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 12px 2vw;
+      }
+      .match-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .match-label {
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Addition at the Zoo – Early Years</h1>
+  <div class="container" id="mainContainer"></div>
+  <script>
+    // Main Topics and Questions for 3–6 year-olds
+    const topics = [
+      {
+        title: "Who Went to the Zoo?",
+        questions: [
+          {
+            type: "mcq",
+            text: "How many people went to the zoo with Lily?from Lily's family: 4 Lily's friends: 2",
+            options: ["4", "2", "6", "8"],
+            answer: "6",
+            instructions: "Tap the correct number.",
+            feedback: "Great counting! 4 + 2 = 6.",
+            interactive: "People images appear with a happy cheer."
+          },
+          {
+            type: "mcq",
+            text: "If Lily's grandparents also joined, how many people are at the zoo now?",
+            options: ["6", "8", "7", "4"],
+            answer: "8",
+            instructions: "Tap the correct number.",
+            feedback: "Super! 6 + 2 = 8.",
+            interactive: "Grandparents join the group with a wave."
+          },
+          {
+            type: "mcq",
+            text: "If one friend couldn't come, how many people are at the zoo?",
+            options: ["5", "6", "7", "4"],
+            answer: "5",
+            instructions: "Tap the correct number.",
+            feedback: "Well done! 4 + 1 = 5.",
+            interactive: "A friend waves goodbye."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number to finish: 4 + 2 = ?",
+            options: ["5", "6", "7"],
+            answer: "6",
+            instructions: "Drag the number to the box.",
+            feedback: "You did it! 4 + 2 = 6.",
+            interactive: "Numbers bounce into the box."
+          },
+          {
+            type: "matching",
+            text: "Match each group to their number.",
+            pairs: [
+              {label: "Lily's family", num: "4"},
+              {label: "Friends", num: "2"},
+              {label: "Grandparents", num: "2"}
+            ],
+            instructions: "Choose the right number for each group.",
+            feedback: "Perfect match!",
+            interactive: "Lines glow on correct match."
+          },
+          {
+            type: "mini",
+            text: "Mini-Game: Memory Match – Find pairs of people and numbers.",
+            pairs: ["Family-4", "Friends-2", "Grandparents-2", "Family-4", "Friends-2", "Grandparents-2"],
+            instructions: "Tap cards to flip and find pairs.",
+            feedback: "You found a match! Well done!",
+            interactive: "Cards flip with cheerful sounds."
+          },
+          {
+            type: "mcq",
+            text: "Who has more people: Lily's family or her friends?",
+            options: ["Family", "Friends", "Both same"],
+            answer: "Family",
+            instructions: "Tap the right answer.",
+            feedback: "Yes! Family has more.",
+            interactive: "Family group jumps with joy."
+          }
+        ]
+      },
+      {
+        title: "Addition Up to 10",
+        questions: [
+          {
+            type: "mcq",
+            text: "What is 3 + 2?",
+            options: ["4", "5", "6"],
+            answer: "5",
+            instructions: "Tap the correct answer.",
+            feedback: "Well done! 3 + 2 = 5.",
+            interactive: "Balls bounce and count out loud."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number to finish: 4 + 3 = ?",
+            options: ["6", "7", "8"],
+            answer: "7",
+            instructions: "Drag the number to the box.",
+            feedback: "Super! 4 + 3 = 7.",
+            interactive: "Balls bounce into the box."
+          },
+          {
+            type: "matching",
+            text: "Match the sum to the answer.",
+            pairs: [
+              {label: "5 + 4", num: "9"},
+              {label: "2 + 5", num: "7"},
+              {label: "4 + 1", num: "5"}
+            ],
+            instructions: "Match each sum to its answer.",
+            feedback: "Great matching!",
+            interactive: "Lines glow when matched."
+          },
+          {
+            type: "mcq",
+            text: "What is 2 + 6?",
+            options: ["6", "8", "7"],
+            answer: "8",
+            instructions: "Tap the correct answer.",
+            feedback: "You got it! 2 + 6 = 8.",
+            interactive: "Balls bounce and count out loud."
+          },
+          {
+            type: "mini",
+            text: "Mini-Game: Memory Match – Find pairs of sums and answers.",
+            pairs: ["6+3-9", "4+2-6", "3+4-7", "6+3-9", "4+2-6", "3+4-7"],
+            instructions: "Tap cards to flip and find pairs.",
+            feedback: "Nice memory!",
+            interactive: "Cards flip and sparkle."
+          },
+          {
+            type: "mcq",
+            text: "What is 1 + 2?",
+            options: ["2", "3", "4"],
+            answer: "3",
+            instructions: "Tap the correct answer.",
+            feedback: "That's right! 1 + 2 = 3.",
+            interactive: "Balls bounce and count out loud."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number: 5 + 2 = ?",
+            options: ["6", "7", "8"],
+            answer: "7",
+            instructions: "Drag the number to the box.",
+            feedback: "You did it! 5 + 2 = 7.",
+            interactive: "Balls bounce into the box."
+          }
+        ]
+      },
+      {
+        title: "Addition with Zero",
+        questions: [
+          {
+            type: "mcq",
+            text: "What is 6 + 0?",
+            options: ["0", "6", "7"],
+            answer: "6",
+            instructions: "Tap the correct answer.",
+            feedback: "Correct! Adding zero keeps the number the same.",
+            interactive: "Zero bounces with a smile."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number: 0 + 5 = ?",
+            options: ["0", "5", "10"],
+            answer: "5",
+            instructions: "Drag the number to the box.",
+            feedback: "That's right! 0 + 5 = 5.",
+            interactive: "Zero bounces into the box."
+          },
+          {
+            type: "matching",
+            text: "Match the sum to the answer.",
+            pairs: [
+              {label: "3 + 0", num: "3"},
+              {label: "0 + 4", num: "4"},
+              {label: "7 + 0", num: "7"}
+            ],
+            instructions: "Match each sum to its answer.",
+            feedback: "Great matching!",
+            interactive: "Lines glow when matched."
+          },
+          {
+            type: "mcq",
+            text: "What is 0 + 2?",
+            options: ["2", "0", "1"],
+            answer: "2",
+            instructions: "Tap the correct answer.",
+            feedback: "Yes! 0 + 2 = 2.",
+            interactive: "Zero bounces with a smile."
+          },
+          {
+            type: "mini",
+            text: "Mini-Game: Memory Match – Find pairs of sums and answers.",
+            pairs: ["0+3-3", "0+6-6", "0+2-2", "0+3-3", "0+6-6", "0+2-2"],
+            instructions: "Tap cards to flip and find pairs.",
+            feedback: "Great job!",
+            interactive: "Cards flip and sparkle."
+          },
+          {
+            type: "mcq",
+            text: "What is 5 + 0?",
+            options: ["0", "5", "6"],
+            answer: "5",
+            instructions: "Tap the correct answer.",
+            feedback: "That's right! 5 + 0 = 5.",
+            interactive: "Zero bounces with a smile."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number: 0 + 8 = ?",
+            options: ["0", "8", "10"],
+            answer: "8",
+            instructions: "Drag the number to the box.",
+            feedback: "Well done! 0 + 8 = 8.",
+            interactive: "Zero bounces into the box."
+          }
+        ]
+      },
+      {
+        title: "Adding Everyday Objects",
+        questions: [
+          {
+            type: "mcq",
+            text: "Ravi has 8 apples and Sita has 7 apples. How many apples in all?",
+            options: ["14", "15", "16"],
+            answer: "15",
+            instructions: "Tap the correct answer.",
+            feedback: "Yum! 8 + 7 = 15 apples.",
+            interactive: "Apples appear in a basket."
+          },
+          {
+            type: "mcq",
+            text: "John has 5 oranges and Mary has 4 oranges. How many oranges in total?",
+            options: ["8", "9", "10"],
+            answer: "9",
+            instructions: "Tap the correct answer.",
+            feedback: "Juicy! 5 + 4 = 9 oranges.",
+            interactive: "Oranges roll into a basket."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number: 7 bananas + 6 bananas = ?",
+            options: ["12", "13", "14"],
+            answer: "13",
+            instructions: "Drag the number to the box.",
+            feedback: "Great counting! 7 + 6 = 13.",
+            interactive: "Bananas appear in bunches."
+          },
+          {
+            type: "matching",
+            text: "Match the object to the total.",
+            pairs: [
+              {label: "Candies (4+5)", num: "9"},
+              {label: "Books (3+2)", num: "5"},
+              {label: "Bananas (7+6)", num: "13"}
+            ],
+            instructions: "Match each object to its total.",
+            feedback: "Sweet matching!",
+            interactive: "Objects pop into place."
+          },
+          {
+            type: "mini",
+            text: "Mini-Game: Memory Match – Find pairs of objects and numbers.",
+            pairs: ["🍎-15", "🍊-9", "🍌-13", "🍎-15", "🍊-9", "🍌-13"],
+            instructions: "Tap cards to flip and find pairs.",
+            feedback: "You matched them all!",
+            interactive: "Cards flip and sparkle."
+          },
+          {
+            type: "mcq",
+            text: "Tina has 4 candies and Rohan has 5 candies. How many candies in all?",
+            options: ["8", "9", "10"],
+            answer: "9",
+            instructions: "Tap the correct answer.",
+            feedback: "Yummy! 4 + 5 = 9 candies.",
+            interactive: "Candies appear in a bowl."
+          },
+          {
+            type: "drag",
+            text: "Drag the right number: 3 books + 2 books = ?",
+            options: ["4", "5", "6"],
+            answer: "5",
+            instructions: "Drag the number to the box.",
+            feedback: "Great! 3 + 2 = 5 books.",
+            interactive: "Books stack up."
+          }
+        ]
+      }
+    ];
+
+    let currentTopic = 0;
+
+    function renderPage() {
+      const topic = topics[currentTopic];
+      let html = `
+        <div class="nav-buttons">
+          <button class="nav-btn" onclick="prevPage()" ${currentTopic === 0 ? 'disabled' : ''}>Previous</button>
+          <span class="topic-title">${topic.title}</span>
+          <button class="nav-btn" onclick="nextPage()" ${currentTopic === topics.length - 1 ? 'disabled' : ''}>Next</button>
+        </div>
+      `;
+      topic.questions.forEach((q, idx) => {
+        html += `<div class="question-block" id="q${idx}">`;
+        html += `<div class="question-type">${questionTypeLabel(q.type)}</div>`;
+        html += `<div class="question-text">${q.text}</div>`;
+
+        if (q.type === "mcq") {
+          html += `<div class="options">`;
+          q.options.forEach(opt => {
+            html += `<button class="option-btn" onclick="mcqCheck(this, '${q.answer}', 'q${idx}f')">${opt}</button>`;
+          });
+          html += `</div>`;
+        }
+        if (q.type === "drag") {
+          html += `<div class="drag-options">`;
+          q.options.forEach(opt => {
+            html += `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${idx}${opt}">${opt}</div>`;
+          });
+          html += `</div>
+            <span class="drop-zone" id="dropZone${idx}" ondrop="drop(event, '${q.answer}', 'q${idx}f', ${idx})" ondragover="allowDrop(event)">Drop here</span>`;
+        }
+        if (q.type === "matching") {
+          q.pairs.forEach((pair, i) => {
+            html += `<div class="match-row"><span class="match-label">${pair.label}</span>
+              <select class="match-select" id="match${idx}${i}">
+                <option value="">--Choose--</option>
+                <option value="${pair.num}">${pair.num}</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="13">13</option>
+              </select></div>`;
+          });
+          html += `<button class="option-btn" onclick="checkMatch(${idx}, '${q.feedback}', ${JSON.stringify(q.pairs)})">Check Answers</button>`;
+        }
+        if (q.type === "mini") {
+          html += `<div class="mini-options" id="memory-cards${idx}">`;
+          q.pairs.forEach((pair, i) => {
+            html += `<button class="mini-btn" onclick="memoryFlip(${idx},${i})">${pair}</button>`;
+          });
+          html += `</div>`;
+        }
+
+        html += `<div class="instructions">${q.instructions}</div>
+          <div class="feedback" id="q${idx}f"></div>
+          <div class="interactive">${q.interactive}</div>
+        </div>`;
+      });
+
+      document.getElementById('mainContainer').innerHTML = html;
+      memoryFlipped = [];
+      memoryMatched = [];
+    }
+
+    function questionTypeLabel(type) {
+      switch(type) {
+        case "mcq": return "Multiple Choice";
+        case "drag": return "Drag-and-Drop";
+        case "matching": return "Matching";
+        case "mini": return "Mini-Game: Memory Match";
+        default: return "";
+      }
+    }
+
+    function prevPage() {
+      if (currentTopic > 0) {
+        currentTopic--;
+        renderPage();
+      }
+    }
+    function nextPage() {
+      if (currentTopic < topics.length - 1) {
+        currentTopic++;
+        renderPage();
+      }
+    }
+
+    // --- MCQ Logic ---
+    function mcqCheck(btn, answer, feedbackId) {
+      const feedback = document.getElementById(feedbackId);
+      if (btn.textContent === answer) {
+        feedback.textContent = "Hooray! You got it!";
+        feedback.style.color = '#43a047';
+        btn.style.background = '#b2dfdb';
+        confetti();
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = '#e53935';
+        btn.style.background = '#ffcdd2';
+      }
+    }
+
+    // --- Drag-and-Drop Logic ---
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function drop(ev, answer, feedbackId, idx) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text");
+      const dragged = document.getElementById(data);
+      const dropZone = document.getElementById('dropZone'+idx);
+      dropZone.textContent = dragged.textContent;
+      const feedback = document.getElementById(feedbackId);
+      if (dragged.textContent === answer) {
+        feedback.textContent = "Yay! You got it!";
+        feedback.style.color = '#43a047';
+        dropZone.style.background = "#b2dfdb";
+        confetti();
+      } else {
+        feedback.textContent = "Oops! Try again!";
+        feedback.style.color = '#e53935';
+        dropZone.style.background = "#ffcdd2";
+      }
+    }
+
+    // --- Matching Logic ---
+    function checkMatch(idx, feedbackText, pairs) {
+      let isCorrect = true;
+      pairs.forEach((pair, i) => {
+        const select = document.getElementById("match"+idx+i);
+        if (select.value !== pair.num) isCorrect = false;
+      });
+      const feedback = document.getElementById('q'+idx+'f');
+      if (isCorrect) {
+        feedback.textContent = feedbackText;
+        feedback.style.color = '#43a047';
+        confetti();
+      } else {
+        feedback.textContent = "Try matching again!";
+        feedback.style.color = '#e53935';
+      }
+    }
+
+    // --- Memory Match Mini-Game Logic ---
+    let memoryFlipped = [], memoryMatched = [];
+    function memoryFlip(idx, cardIdx) {
+      // Find the correct question for this topic
+      const q = topics[currentTopic].questions.find(q => q.type === "mini");
+      const pairs = q.pairs;
+      if (!q) return;
+      if (memoryMatched.includes(cardIdx) || memoryFlipped.length === 2) return;
+      const buttons = document.querySelectorAll(`#memory-cards${idx} .mini-btn`);
+      buttons[cardIdx].style.background = "#b2dfdb";
+      memoryFlipped.push(cardIdx);
+      if (memoryFlipped.length === 2) {
+        const [a, b] = memoryFlipped;
+        if (a !== b && pairs[a] === pairs[b]) {
+          memoryMatched.push(a, b);
+          setTimeout(() => {
+            buttons[a].style.visibility = "hidden";
+            buttons[b].style.visibility = "hidden";
+            document.getElementById('q'+idx+'f').textContent = "You found a match! Great memory!";
+            document.getElementById('q'+idx+'f').style.color = "#43a047";
+            if (memoryMatched.length === pairs.length) {
+              document.getElementById('q'+idx+'f').textContent = "You matched them all! Well done!";
+              confetti();
+            }
+            memoryFlipped = [];
+          }, 600);
+        } else {
+          setTimeout(() => {
+            buttons[a].style.background = "#ffe082";
+            buttons[b].style.background = "#ffe082";
+            document.getElementById('q'+idx+'f').textContent = "Try again!";
+            document.getElementById('q'+idx+'f').style.color = "#e53935";
+            memoryFlipped = [];
+          }, 700);
+        }
+      }
+    }
+
+    // --- Confetti Animation ---
+    function confetti() {
+      for(let i=0;i<15;i++) {
+        let conf = document.createElement('div');
+        conf.style.position = 'fixed';
+        conf.style.left = (Math.random()*100)+'vw';
+        conf.style.top = '-30px';
+        conf.style.fontSize = (Math.random()*16+16)+'px';
+        conf.style.color = ['#ffb300','#43a047','#4a90e2','#ff7043','#e91e63'][Math.floor(Math.random()*5)];
+        conf.innerHTML = '★';
+        document.body.appendChild(conf);
+        let fall = setInterval(()=>{
+          conf.style.top = (parseFloat(conf.style.top)+3)+'px';
+          if(parseFloat(conf.style.top)>window.innerHeight){
+            conf.remove();
+            clearInterval(fall);
+          }
+        }, 16);
+      }
+    }
+
+    // Initial render
+    renderPage();
+  </script>
+</body>
+</html>
